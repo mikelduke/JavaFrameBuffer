@@ -1,4 +1,6 @@
-pid.txt
+FrameBufferJNI.dll
+libFrameBufferJNI.jnilib
+libFrameBufferJNI.so
 
 
 # Created by https://www.gitignore.io/api/eclipse,gradle,maven,java
