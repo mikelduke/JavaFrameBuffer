@@ -76,6 +76,8 @@ public class FrameBuffer {
 	private native int getDeviceBitsPerPixel(long di);
 
 	private native boolean updateDeviceBuffer(long di, int[] buffer);
+	
+	public static final String EXTRACT_FILES[] = {"FrameBufferJNI.dll", "libFrameBufferJNI.jnilib", "libFrameBufferJNI.so"};
 
 	static {
 		System.loadLibrary("FrameBufferJNI"); // FrameBufferJNI.dll (Windows) or FrameBufferJNI.so (Unixes)
