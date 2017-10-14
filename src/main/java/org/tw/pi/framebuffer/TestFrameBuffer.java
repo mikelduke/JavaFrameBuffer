@@ -138,20 +138,27 @@ public class TestFrameBuffer {
 	// -----------------------------------------------------------------------------------------------------------------
 
 	public static void main(String[] args) {
-
+		boolean useDummy = false;
+		if (args.length > 0 && args[0].equalsIgnoreCase("dummy")) {
+			useDummy = true;
+		}
+		
+		final boolean fUseDummy = useDummy;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				TestFrameBuffer mt = new TestFrameBuffer("/dev/fb1");
-//				TestFrameBuffer mt = new TestFrameBuffer("dummy_200x330");
-
-				if (false) {
+				TestFrameBuffer mt;
+				if (fUseDummy) {
+					mt = new TestFrameBuffer("dummy_200x330");
+					
 					JFrame f = new JFrame("Frame Buffer Test");
 					f.setSize(400, 400);
 					f.setLocation(300,200);
 					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					f.getContentPane().add(BorderLayout.CENTER, mt.fb.getScreenPanel());
 					f.setVisible(true);
+				} else {
+					mt = new TestFrameBuffer("/dev/fb1");
 				}
 
 				mt.startTests();
