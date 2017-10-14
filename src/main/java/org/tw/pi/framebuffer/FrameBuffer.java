@@ -15,6 +15,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.JPanel;
@@ -77,10 +82,51 @@ public class FrameBuffer {
 
 	private native boolean updateDeviceBuffer(long di, int[] buffer);
 	
-	public static final String EXTRACT_FILES[] = {"FrameBufferJNI.dll", "libFrameBufferJNI.jnilib", "libFrameBufferJNI.so"};
+	private static final String EXTRACT_FILES[] = {"FrameBufferJNI.dll", "libFrameBufferJNI.jnilib", "libFrameBufferJNI.so"};
 
 	static {
-		System.loadLibrary("FrameBufferJNI"); // FrameBufferJNI.dll (Windows) or FrameBufferJNI.so (Unixes)
+		try {
+			System.loadLibrary("FrameBufferJNI"); // FrameBufferJNI.dll (Windows) or FrameBufferJNI.so (Unixes)
+		} catch (UnsatisfiedLinkError e) {
+			try {
+				extractFromJar();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			System.loadLibrary("FrameBufferJNI");
+		}
+	}
+
+	private static void extractFromJar() {
+		for (String file : EXTRACT_FILES) {
+			System.out.println("Extracing " + file);
+			
+			try (InputStream in = FrameBuffer.class.getResourceAsStream("/" + file)) {
+				if (in == null) {
+					System.err.println("Error loading file " + file);
+					continue;
+				}
+				File fileOut = new File(file);
+				if (fileOut.exists()) {
+					System.out.println("File " + file + " already exists");
+					continue;
+				}
+	
+				try (OutputStream out = new FileOutputStream(fileOut)) {
+					int n;
+					byte[] buffer = new byte[1024];
+					while((n = in.read(buffer)) > -1) {
+						out.write(buffer, 0, n);
+					}
+				} catch (IOException e) {
+					System.err.println("Error writing file " + file);
+					e.printStackTrace();
+				}
+			} catch (IOException e) {
+				System.out.println("Error reading file");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
